@@ -1,7 +1,7 @@
 {
   "name": "sandbox-doctor",
   "displayName": "Sandbox Doctor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Whether Claude Code's Bash sandbox can work on this machine, and which sandbox settings can never take effect. One user-only skill: /sandbox-doctor:check.",
   "author": { "name": "Naresh Prabu" },
   "homepage": "https://github.com/nrzz/claude-sandbox-doctor",

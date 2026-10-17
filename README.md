@@ -117,7 +117,7 @@ Whether the Bash sandbox can start on this machine. It does not run Claude Code 
 
 ```text
 $ claude-sandbox-doctor check
-claude-sandbox-doctor 1.0.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   ok    bubblewrap 0.9.0 at /usr/bin/bwrap
@@ -149,7 +149,7 @@ The line with `#43454` is information, not a failure: the command that fails in 
 
 ```text
 $ claude-sandbox-doctor check --live
-claude-sandbox-doctor 1.0.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   ok    bubblewrap 0.9.0 at /usr/bin/bwrap
@@ -188,7 +188,7 @@ On macOS, in CI (the first part, `check` alone, is only the `sandbox-exec` line)
 
 ```text
 $ claude-sandbox-doctor check --live
-claude-sandbox-doctor 1.0.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
 system    macOS 26.6.2  (arm64)
 
   ok    Seatbelt works: sandbox-exec ran a command under a profile (/usr/bin/sandbox-exec)
@@ -210,7 +210,7 @@ On a Linux machine that has neither `bubblewrap` nor `socat` (the CI job that re
 
 ```text
 $ claude-sandbox-doctor check
-claude-sandbox-doctor 1.0.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   FAIL  bubblewrap (bwrap) is not installed
@@ -244,7 +244,7 @@ The merged `sandbox` settings, with the file and line of every value. `~/shop` i
 
 ```text
 $ claude-sandbox-doctor show --project ~/shop
-claude-sandbox-doctor 1.0.0  the sandbox settings Claude Code merges
+claude-sandbox-doctor 1.1.0  the sandbox settings Claude Code merges
 project   /home/runner/shop
 config    /home/runner/.claude
 system    Linux, Ubuntu 24.04.5 LTS
@@ -299,7 +299,7 @@ Whether Claude Code runs a Bash call inside the sandbox or outside it, and which
 
 ```text
 $ claude-sandbox-doctor why "docker compose up -d" --project ~/shop
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/shop
 call      docker compose up -d
 
@@ -325,7 +325,7 @@ The entry `docker`, without a wildcard, matches only the bare command, so `docke
 
 ```text
 $ claude-sandbox-doctor why "docker ps" --project ~/shop
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/shop
 call      docker ps
 
@@ -354,7 +354,7 @@ A `cd` in the call keeps the whole call inside, even where the other part has an
 
 ```text
 $ claude-sandbox-doctor why "cd infra && terraform plan" --project ~/shop
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/shop
 call      cd infra && terraform plan
 
@@ -384,7 +384,7 @@ So does a redirection to a file (the entry `npm run build > build.log` can never
 
 ```text
 $ claude-sandbox-doctor why "npm run build > build.log" --project ~/shop
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/shop
 call      npm run build > build.log
 
@@ -415,7 +415,7 @@ Note: A PreToolUse hook, or a mod, can decide a call before any of this; hooks a
 
 ```text
 $ claude-sandbox-doctor why "npm test" --project ~/shop --retry
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/shop
 call      npm test   (as a retry with dangerouslyDisableSandbox: true)
 
@@ -441,7 +441,7 @@ In `~/locked`, which has `allowUnsandboxedCommands: false`, the retry is refused
 
 ```text
 $ claude-sandbox-doctor why "npm test" --project ~/locked --retry
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/locked
 call      npm test   (as a retry with dangerouslyDisableSandbox: true)
 
@@ -463,7 +463,7 @@ An excluded command in `~/locked` still leaves the sandbox, because `excludedCom
 
 ```text
 $ claude-sandbox-doctor why "gh pr list" --project ~/locked
-claude-sandbox-doctor 1.0.0  where a Bash call runs
+claude-sandbox-doctor 1.1.0  where a Bash call runs
 project   /home/runner/locked
 call      gh pr list
 
@@ -488,7 +488,7 @@ Sandbox settings that can never take effect, each with the file and line, what C
 
 ```text
 $ claude-sandbox-doctor lint --project ~/shop
-claude-sandbox-doctor 1.0.0  lint
+claude-sandbox-doctor 1.1.0  lint
 project   /home/runner/shop
 system    Linux, Ubuntu 24.04.5 LTS
 

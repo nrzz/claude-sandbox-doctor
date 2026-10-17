@@ -2,6 +2,11 @@
 
 All notable changes to claude-sandbox-doctor are written here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-10-17
+
+- `lint` warns about an `allowedDomains` entry for a loopback or link-local address (`127.0.0.1`, `[::1]:8080`, `169.254.169.254`): the sandbox's proxy refuses a connection to a local address even when the host is on the list, as the documentation says. The rule is `domain-local`, severity warning, basis docs (the binary was not asked). `localhost`, `*.localhost` and `deniedDomains` are left alone.
+- Contributed by [@Lumichandesu](https://github.com/Lumichandesu) in [#2](https://github.com/nrzz/claude-sandbox-doctor/pull/2), the first outside pull request, for the good first issue [#1](https://github.com/nrzz/claude-sandbox-doctor/issues/1).
+
 ## [1.0.0] - 2026-10-16
 
 - First release. A CLI and a Claude Code plugin with one user-only skill, `/sandbox-doctor:check`.
@@ -13,4 +18,5 @@ All notable changes to claude-sandbox-doctor are written here. The format follow
 - What the tool says about Claude Code is what the real binary did: the tests put a table of calls, a table of approvals, a table of domain entries, the rows that need managed settings, the bubblewrap command line, the merged-usr layout, the keys that do nothing and the network under each permission mode to Claude Code 2.1.289 to 2.1.302 in CI on Linux and macOS, and the Windows paths to 2.1.295 and 2.1.299 on Windows. The README's "What was verified, and how" says what was asked and what was not.
 - Zero tokens for the tool. The skill is user-only, adds nothing to a request that does not use it, and hands the model at most 12 findings and 7 lines of checks.
 
+[1.1.0]: https://github.com/nrzz/claude-sandbox-doctor/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nrzz/claude-sandbox-doctor/releases/tag/v1.0.0

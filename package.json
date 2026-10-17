@@ -1,6 +1,6 @@
 {
   "name": "claude-sandbox-doctor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Whether Claude Code's Bash sandbox works on this machine, the merged sandbox settings and where each came from, why a command ran inside the sandbox, outside it or not at all, and which sandbox settings can never take effect. Zero tokens.",
   "type": "module",
   "bin": {
