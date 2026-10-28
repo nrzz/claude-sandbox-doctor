@@ -2,6 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpDir, put } from "./helpers.mjs";
@@ -86,6 +87,21 @@ test("the fake Messages API answers with the calls it is given, one for each tur
     assert.equal(api.requests.length, 3);
     const r = await fetch(`http://127.0.0.1:${api.port}/v1/other`, { method: "POST", body: "{}" });
     assert.equal(r.status, 404);
+  } finally { await api.close(); }
+});
+
+test("the fake Messages API reads a request whose two chunks split a character (the em dash of Claude Code's prompt) as the whole character", async () => {
+  const api = await startFakeApi([]);
+  try {
+    const body = Buffer.from(JSON.stringify({ stream: false, system: "one — two", messages: [] }));
+    const cut = body.indexOf(0xe2) + 1;
+    await new Promise((resolve, reject) => {
+      const req = http.request({ host: "127.0.0.1", port: api.port, path: "/v1/messages", method: "POST", headers: { "content-type": "application/json" } }, (res) => { res.resume(); res.on("end", resolve); });
+      req.on("error", reject);
+      req.write(body.subarray(0, cut));
+      setTimeout(() => req.end(body.subarray(cut)), 50);
+    });
+    assert.equal(api.requests[0].system, "one — two");
   } finally { await api.close(); }
 });
 

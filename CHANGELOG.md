@@ -2,6 +2,11 @@
 
 All notable changes to claude-sandbox-doctor are written here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-10-28
+
+- `check --live`: the fake Messages API reads each request as UTF-8 across its chunks, so a character that a chunk boundary splits in two, such as an em dash of Claude Code's system prompt, is recorded whole instead of as replacement characters. No verdict depended on it: the fake API reads only how many turns a request holds, and the verdicts come from what Claude Code prints. The tests' copy of the fake API had the same fix in 100c661.
+- A test sends the fake API a request in two chunks cut inside an em dash: 221 automated tests, of which 187 pass and 34 are skipped without a Claude Code binary.
+
 ## [1.1.0] - 2026-10-17
 
 - `lint` warns about an `allowedDomains` entry for a loopback or link-local address (`127.0.0.1`, `[::1]:8080`, `169.254.169.254`): the sandbox's proxy refuses a connection to a local address even when the host is on the list, as the documentation says. The rule is `domain-local`, severity warning, basis docs (the binary was not asked). `localhost`, `*.localhost` and `deniedDomains` are left alone.
@@ -18,5 +23,6 @@ All notable changes to claude-sandbox-doctor are written here. The format follow
 - What the tool says about Claude Code is what the real binary did: the tests put a table of calls, a table of approvals, a table of domain entries, the rows that need managed settings, the bubblewrap command line, the merged-usr layout, the keys that do nothing and the network under each permission mode to Claude Code 2.1.289 to 2.1.302 in CI on Linux and macOS, and the Windows paths to 2.1.295 and 2.1.299 on Windows. The README's "What was verified, and how" says what was asked and what was not.
 - Zero tokens for the tool. The skill is user-only, adds nothing to a request that does not use it, and hands the model at most 12 findings and 7 lines of checks.
 
+[1.1.1]: https://github.com/nrzz/claude-sandbox-doctor/releases/tag/v1.1.1
 [1.1.0]: https://github.com/nrzz/claude-sandbox-doctor/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nrzz/claude-sandbox-doctor/releases/tag/v1.0.0

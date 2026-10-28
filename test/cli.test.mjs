@@ -52,7 +52,7 @@ test("show: the merged settings through the command line, as text and as JSON", 
   w.project({ sandbox: { excludedCommands: ["make *"], autoAllowBashIfSandboxed: false } });
   const t = await run(["show"], w, { sys: ubuntu({ profile: true }) });
   assert.equal(t.code, 0);
-  assert.match(t.out, /^claude-sandbox-doctor 1\.1\.0 {2}the sandbox settings Claude Code merges\n/);
+  assert.match(t.out, /^claude-sandbox-doctor 1\.1\.1 {2}the sandbox settings Claude Code merges\n/);
   assert.match(t.out, /^system {4}Linux, Ubuntu 24\.04\.5 LTS\n/m);
   assert.match(t.out, /^ {2}project +\.claude\/settings\.json +read, 2 sandbox keys$/m);
   assert.match(t.out, /^ {2}enabled +true +user ~\/\.claude\/settings\.json:3$/m);

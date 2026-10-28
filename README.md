@@ -117,7 +117,7 @@ Whether the Bash sandbox can start on this machine. It does not run Claude Code 
 
 ```text
 $ claude-sandbox-doctor check
-claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   ok    bubblewrap 0.9.0 at /usr/bin/bwrap
@@ -149,7 +149,7 @@ The line with `#43454` is information, not a failure: the command that fails in 
 
 ```text
 $ claude-sandbox-doctor check --live
-claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   ok    bubblewrap 0.9.0 at /usr/bin/bwrap
@@ -188,7 +188,7 @@ On macOS, in CI (the first part, `check` alone, is only the `sandbox-exec` line)
 
 ```text
 $ claude-sandbox-doctor check --live
-claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
 system    macOS 26.6.2  (arm64)
 
   ok    Seatbelt works: sandbox-exec ran a command under a profile (/usr/bin/sandbox-exec)
@@ -210,7 +210,7 @@ On a Linux machine that has neither `bubblewrap` nor `socat` (the CI job that re
 
 ```text
 $ claude-sandbox-doctor check
-claude-sandbox-doctor 1.1.0  can the Bash sandbox work here
+claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   FAIL  bubblewrap (bwrap) is not installed
@@ -244,7 +244,7 @@ The merged `sandbox` settings, with the file and line of every value. `~/shop` i
 
 ```text
 $ claude-sandbox-doctor show --project ~/shop
-claude-sandbox-doctor 1.1.0  the sandbox settings Claude Code merges
+claude-sandbox-doctor 1.1.1  the sandbox settings Claude Code merges
 project   /home/runner/shop
 config    /home/runner/.claude
 system    Linux, Ubuntu 24.04.5 LTS
@@ -299,7 +299,7 @@ Whether Claude Code runs a Bash call inside the sandbox or outside it, and which
 
 ```text
 $ claude-sandbox-doctor why "docker compose up -d" --project ~/shop
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/shop
 call      docker compose up -d
 
@@ -325,7 +325,7 @@ The entry `docker`, without a wildcard, matches only the bare command, so `docke
 
 ```text
 $ claude-sandbox-doctor why "docker ps" --project ~/shop
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/shop
 call      docker ps
 
@@ -354,7 +354,7 @@ A `cd` in the call keeps the whole call inside, even where the other part has an
 
 ```text
 $ claude-sandbox-doctor why "cd infra && terraform plan" --project ~/shop
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/shop
 call      cd infra && terraform plan
 
@@ -384,7 +384,7 @@ So does a redirection to a file (the entry `npm run build > build.log` can never
 
 ```text
 $ claude-sandbox-doctor why "npm run build > build.log" --project ~/shop
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/shop
 call      npm run build > build.log
 
@@ -415,7 +415,7 @@ Note: A PreToolUse hook, or a mod, can decide a call before any of this; hooks a
 
 ```text
 $ claude-sandbox-doctor why "npm test" --project ~/shop --retry
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/shop
 call      npm test   (as a retry with dangerouslyDisableSandbox: true)
 
@@ -441,7 +441,7 @@ In `~/locked`, which has `allowUnsandboxedCommands: false`, the retry is refused
 
 ```text
 $ claude-sandbox-doctor why "npm test" --project ~/locked --retry
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/locked
 call      npm test   (as a retry with dangerouslyDisableSandbox: true)
 
@@ -463,7 +463,7 @@ An excluded command in `~/locked` still leaves the sandbox, because `excludedCom
 
 ```text
 $ claude-sandbox-doctor why "gh pr list" --project ~/locked
-claude-sandbox-doctor 1.1.0  where a Bash call runs
+claude-sandbox-doctor 1.1.1  where a Bash call runs
 project   /home/runner/locked
 call      gh pr list
 
@@ -488,7 +488,7 @@ Sandbox settings that can never take effect, each with the file and line, what C
 
 ```text
 $ claude-sandbox-doctor lint --project ~/shop
-claude-sandbox-doctor 1.1.0  lint
+claude-sandbox-doctor 1.1.1  lint
 project   /home/runner/shop
 system    Linux, Ubuntu 24.04.5 LTS
 
@@ -725,7 +725,7 @@ It reads the settings files listed above and, for `check`, the system facts list
 
 Checked on 2026-10-16 and 2026-10-17 on Windows 11 with Node 24.19.0, git 2.55.0 and Claude Code 2.1.295 and 2.1.299 (every real-binary check that can run on Windows passed on both; the others need the sandbox, which Windows does not have). CI runs the unit tests on Linux, macOS and Windows with Node 20, 22 and 24 and on Linux with Node 18. It runs the real-binary checks on Linux (with bubblewrap and socat, and in a job that removes them) and on macOS, with Node 22, against the npm release of Claude Code (2.1.301 on 16 October 2026) and, started by hand with the workflow's version input, against 2.1.289, 2.1.292, 2.1.295, 2.1.299 and 2.1.302. On commit 9a5b80f all 10 jobs of the unit tests (run 38958398995) and all 3 jobs of the real-binary checks (run 38958399160) were green, and so were the 5 hand-started runs (38958408773, 38958416192, 38958423933, 38958432420 and 38958440346). The badges at the top show the latest runs. The CI image was ubuntu-latest (Ubuntu 24.04.5 LTS, kernel 6.17.0-1022-azure, bubblewrap 0.9.0, socat 1.8.0.0) and macos-latest (macOS 26.6.2, arm64).
 
-- **220 automated tests** (`npm test`, Node's own runner, no dependencies, about 4 seconds on the machine it was written on and 5 to 12 in CI). `node --test` also reports each of the 8 helper files under `test/` as a passing test, on every Node version CI runs (18 to 24); those are not counted here. Without a Claude Code binary 186 pass and 34 are skipped, on Windows, macOS and Linux alike: the skipped ones are the real-binary checks below, which run only when `E2E_CLAUDE` names a binary. The tests cover:
+- **221 automated tests** (`npm test`, Node's own runner, no dependencies, about 4 seconds on the machine it was written on and 5 to 12 in CI). `node --test` also reports each of the 8 helper files under `test/` as a passing test, on every Node version CI runs (18 to 24); those are not counted here. Without a Claude Code binary 187 pass and 34 are skipped, on Windows, macOS and Linux alike: the skipped ones are the real-binary checks below, which run only when `E2E_CLAUDE` names a binary. The tests cover:
   - the settings reader (strict JSON, a comment, a trailing comma, a value of the wrong type, the line of each key, the unknown keys), the merge (the four files, the list keys, a key a file may not set, the admin-required rule, managed drop-ins) and the permission settings that reach the sandbox;
   - the matcher: `excludedCommands` against 221 calls, and a reason for each of the shapes in the table under How it works; the approval, with deny, ask and allow rules; the retry, with the three places `allowUnsandboxedCommands` can be false;
   - `check` on five machines that are not the one running the test (a healthy Ubuntu, an Ubuntu where AppArmor stops bubblewrap, an Ubuntu without `bwrap` and `socat`, a Mac, Windows), the explanation of each bubblewrap error, and `--live` against a stand-in for `claude` in six situations (healthy, outside, unavailable, broken, refuses to start, silent);
