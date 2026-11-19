@@ -96,7 +96,7 @@ test("the CI workflows: the suite on three systems and four Node versions, the r
   assert.match(ci, /uses: actions\/setup-node@/);
   assert.match(ci, /timeout-minutes: \d+/);
   const e2e = read(".github/workflows/e2e.yml");
-  for (const part of ["name: e2e", "ubuntu-latest", "macos-latest", "apt-get install -y bubblewrap socat", "apt-get remove -y bubblewrap socat", "npm install -g @anthropic-ai/claude-code@${{ inputs.claude_version || 'latest' }}", "claude_version:", "continue-on-error: true", "E2E_CLAUDE: claude", "CSD_E2E_MANAGED: \"1\"", "schedule:", "workflow_dispatch"]) assert.ok(e2e.includes(part), part);
+  for (const part of ["name: e2e", "runs-on: ubuntu-24.04", "macos-latest", "apt-get install -y bubblewrap socat", "apt-get remove -y bubblewrap socat", "npm install -g @anthropic-ai/claude-code@${{ inputs.claude_version || 'latest' }}", "claude_version:", "continue-on-error: true", "E2E_CLAUDE: claude", "CSD_E2E_MANAGED: \"1\"", "schedule:", "workflow_dispatch"]) assert.ok(e2e.includes(part), part);
   assert.match(e2e, /timeout-minutes: \d+/);
   assert.ok(!e2e.includes("windows"), "the sandbox does not exist on Windows: no job for it");
   // every real-binary test file runs in some step
