@@ -144,7 +144,9 @@ export function mergeSandbox(settings, { platform = "linux" } = {}) {
     platformListed,
     enabled: enabledInSettings && platformListed,
     failIfUnavailable: val("failIfUnavailable") === true,
-    autoAllowBashIfSandboxed: val("autoAllowBashIfSandboxed") !== false,
+    // off when unset from Claude Code 2.1.324 (its settings schema: "Default: false"); 2.1.323 and earlier read an unset value as true
+    autoAllowBashIfSandboxed: val("autoAllowBashIfSandboxed") === true,
+    autoAllowSet: val("autoAllowBashIfSandboxed") !== undefined,
     allowUnsandboxedCommands: strictBy.length === 0,
     strictBy,
     adminRequired,

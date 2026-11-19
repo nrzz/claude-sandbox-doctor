@@ -79,7 +79,7 @@ function approvalOf({ command, settings, eff, runs }) {
   if (runs === "sandboxed" && eff.enabled) {
     if (rules.ask) return done("ask", "asked", `the ask rule ${rules.ask.raw} still asks, also for a sandboxed call`);
     if (rules.allow) return done("allow-rule", "approved", `approved by the allow rule ${rules.allow.raw}`);
-    if (!eff.autoAllowBashIfSandboxed) return done("regular", "asked", `autoAllowBashIfSandboxed is false, so it ${APPROVAL.regular}`);
+    if (!eff.autoAllowBashIfSandboxed) return done("regular", "asked", `autoAllowBashIfSandboxed is ${eff.autoAllowSet === false ? "not set, which from Claude Code 2.1.324 means off (2.1.323 and earlier approved a sandboxed command without a prompt)" : "false"}, so it ${APPROVAL.regular}`);
     approval.shapes = regularFlowShapes(command);
     if (approval.shapes.length) return done("regular", "asked", `it runs inside the sandbox, but ${APPROVAL.regular} (${approval.shapes[0].text})`);
     return done("auto-allow", "approved", APPROVAL["auto-allow"]);

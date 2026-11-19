@@ -21,7 +21,7 @@ test("a call that every part of is covered runs outside the sandbox, and the mod
 
 test("a call with a part that no entry covers stays inside, and says which part and why", () => {
   const w = world("why-in");
-  w.user({ sandbox: { enabled: true, excludedCommands: ["docker *"] } });
+  w.user({ sandbox: { enabled: true, autoAllowBashIfSandboxed: true, excludedCommands: ["docker *"] } });
   const r = why(w, "cd sub && docker build .");
   assert.equal(r.verdict, "sandboxed");
   assert.equal(r.basis, "no-match");
@@ -70,9 +70,14 @@ test("a sandbox that is off runs everything outside, and says why: no enabled, o
 
 test("approval: auto-allow, the shapes that still go through the regular flow, deny, ask and allow rules", () => {
   const w = world("why-approval");
-  w.user({ sandbox: { enabled: true, excludedCommands: ["gh *"] }, permissions: { deny: ["Bash(rm *)"], ask: ["Bash(git push *)"], allow: ["Bash(gh pr *)"] } });
+  w.user({ sandbox: { enabled: true, autoAllowBashIfSandboxed: true, excludedCommands: ["gh *"] }, permissions: { deny: ["Bash(rm *)"], ask: ["Bash(git push *)"], allow: ["Bash(gh pr *)"] } });
   const ap = (c) => why(w, c).approval;
   assert.equal(ap("mytool run").how, "auto-allow");
+  // unset, it is off from Claude Code 2.1.324, and why says so
+  const u = world("why-approval-unset");
+  u.user({ sandbox: { enabled: true } });
+  assert.equal(why(u, "mytool run").approval.how, "regular");
+  assert.match(why(u, "mytool run").approval.text, /autoAllowBashIfSandboxed is not set, which from Claude Code 2\.1\.324 means off/);
   assert.equal(ap("FOO=bar mytool run").how, "regular");
   assert.match(ap("FOO=bar mytool run").text, /FOO=\.\.\./);
   assert.equal(ap("make CC=clang").how, "regular");
@@ -87,7 +92,7 @@ test("approval: auto-allow, the shapes that still go through the regular flow, d
   assert.equal(why(off, "mytool run").approval.how, "regular");
   assert.match(why(off, "mytool run").approval.text, /autoAllowBashIfSandboxed is false/);
   const bare = world("why-bare");
-  bare.user({ sandbox: { enabled: true, excludedCommands: ["gh *"] }, permissions: { ask: ["Bash"] } });
+  bare.user({ sandbox: { enabled: true, autoAllowBashIfSandboxed: true, excludedCommands: ["gh *"] }, permissions: { ask: ["Bash"] } });
   assert.equal(why(bare, "mytool run").approval.how, "auto-allow", "a bare Bash ask rule is skipped for a sandboxed call");
   assert.equal(why(bare, "gh pr list").approval.how, "ask", "and applies to one that runs outside");
 });

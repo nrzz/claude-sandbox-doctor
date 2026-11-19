@@ -92,7 +92,12 @@ test("a false allowUnsandboxedCommands in user or managed settings holds against
   const c = world("strict-c");
   c.user({ sandbox: { enabled: true } });
   assert.equal(merge(c).effective.allowUnsandboxedCommands, true);
-  assert.equal(merge(c).effective.autoAllowBashIfSandboxed, true);
+  // unset is off from Claude Code 2.1.324 ("Default: false"); set, it is what it says
+  assert.equal(merge(c).effective.autoAllowBashIfSandboxed, false);
+  assert.equal(merge(c).effective.autoAllowSet, false);
+  const d = world("strict-d");
+  d.user({ sandbox: { enabled: true, autoAllowBashIfSandboxed: true } });
+  assert.deepEqual([merge(d).effective.autoAllowBashIfSandboxed, merge(d).effective.autoAllowSet], [true, true]);
 });
 
 test("a sandbox made admin-required by managed settings ignores a repository's entries, and a repository's true for the weaker modes", () => {

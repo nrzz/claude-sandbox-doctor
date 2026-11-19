@@ -125,7 +125,7 @@ export function renderShow(m, { color = false } = {}) {
   out.push(p.bold("What the keys add up to"));
   out.push(`  sandbox on          ${e.enabled ? "yes" : "no"}  ${e.enabled ? "" : !e.enabledInSettings ? "(sandbox.enabled is not true in any file that applies)" : `(managed enabledPlatforms leaves out ${e.claudePlatform})`}`.trimEnd());
   out.push(`  retry outside       ${e.allowUnsandboxedCommands ? "allowed: Claude may retry a failed command with dangerouslyDisableSandbox" : `not allowed (allowUnsandboxedCommands is false in ${e.strictBy.map(where).join(", ")}): Claude Code ignores the parameter`}`);
-  out.push(`  auto-allow          ${e.autoAllowBashIfSandboxed ? "on: a sandboxed command runs without a prompt" : "off: a sandboxed command goes through the regular permission flow"}`);
+  out.push(`  auto-allow          ${e.autoAllowBashIfSandboxed ? "on: a sandboxed command runs without a prompt" : `off: a sandboxed command goes through the regular permission flow${e.autoAllowSet === false ? " (not set: off from Claude Code 2.1.324, on in 2.1.323 and earlier)" : ""}`}`);
   out.push(`  failIfUnavailable   ${e.failIfUnavailable ? "on: Claude Code refuses to start where the sandbox cannot" : "off: where the sandbox cannot start, commands run without it and a warning says so"}`);
   out.push(`  admin-required      ${e.adminRequired ? `yes (${e.adminReasons.join("; ")})` : "no"}`);
   out.push(`  read block          ${e.blockReads.on ? `on (permissions.blockReadsOutsideWorkingDirectories in ${e.blockReads.sources.map(where).join(", ")})` : "off"}`);

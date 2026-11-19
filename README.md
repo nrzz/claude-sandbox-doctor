@@ -117,7 +117,7 @@ Whether the Bash sandbox can start on this machine. It does not run Claude Code 
 
 ```text
 $ claude-sandbox-doctor check
-claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
+claude-sandbox-doctor 1.2.0  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   ok    bubblewrap 0.9.0 at /usr/bin/bwrap
@@ -149,7 +149,7 @@ The line with `#43454` is information, not a failure: the command that fails in 
 
 ```text
 $ claude-sandbox-doctor check --live
-claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
+claude-sandbox-doctor 1.2.0  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   ok    bubblewrap 0.9.0 at /usr/bin/bwrap
@@ -188,7 +188,7 @@ On macOS, in CI (the first part, `check` alone, is only the `sandbox-exec` line)
 
 ```text
 $ claude-sandbox-doctor check --live
-claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
+claude-sandbox-doctor 1.2.0  can the Bash sandbox work here
 system    macOS 26.6.2  (arm64)
 
   ok    Seatbelt works: sandbox-exec ran a command under a profile (/usr/bin/sandbox-exec)
@@ -210,7 +210,7 @@ On a Linux machine that has neither `bubblewrap` nor `socat` (the CI job that re
 
 ```text
 $ claude-sandbox-doctor check
-claude-sandbox-doctor 1.1.1  can the Bash sandbox work here
+claude-sandbox-doctor 1.2.0  can the Bash sandbox work here
 system    Linux, Ubuntu 24.04.5 LTS  (kernel 6.17.0-1022-azure)
 
   FAIL  bubblewrap (bwrap) is not installed
@@ -244,7 +244,7 @@ The merged `sandbox` settings, with the file and line of every value. `~/shop` i
 
 ```text
 $ claude-sandbox-doctor show --project ~/shop
-claude-sandbox-doctor 1.1.1  the sandbox settings Claude Code merges
+claude-sandbox-doctor 1.2.0  the sandbox settings Claude Code merges
 project   /home/runner/shop
 config    /home/runner/.claude
 system    Linux, Ubuntu 24.04.5 LTS
@@ -258,7 +258,7 @@ Settings files, highest precedence first
 What the keys add up to
   sandbox on          yes
   retry outside       allowed: Claude may retry a failed command with dangerouslyDisableSandbox
-  auto-allow          on: a sandboxed command runs without a prompt
+  auto-allow          off: a sandboxed command goes through the regular permission flow (not set: off from Claude Code 2.1.324, on in 2.1.323 and earlier)
   failIfUnavailable   off: where the sandbox cannot start, commands run without it and a warning says so
   admin-required      no
   read block          off
@@ -299,7 +299,7 @@ Whether Claude Code runs a Bash call inside the sandbox or outside it, and which
 
 ```text
 $ claude-sandbox-doctor why "docker compose up -d" --project ~/shop
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/shop
 call      docker compose up -d
 
@@ -325,7 +325,7 @@ The entry `docker`, without a wildcard, matches only the bare command, so `docke
 
 ```text
 $ claude-sandbox-doctor why "docker ps" --project ~/shop
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/shop
 call      docker ps
 
@@ -341,7 +341,7 @@ excludedCommands that apply
   "cd infra && terraform *"               project .claude/settings.json:9
   "npm run build > build.log"             project .claude/settings.json:10
 
-Approval  approved without a prompt: it runs inside the sandbox and autoAllowBashIfSandboxed is on
+Approval  autoAllowBashIfSandboxed is not set, which from Claude Code 2.1.324 means off (2.1.323 and earlier approved a sandboxed command without a prompt), so it goes through the regular permission flow: your allow rules and the permission mode decide whether you see a prompt (a read-only command such as ls passes)
 If Claude retries with dangerouslyDisableSandbox: it runs outside the sandbox
           (allowUnsandboxedCommands is not false); you are asked, or your allow rules decide. Ask with
           --retry.
@@ -354,7 +354,7 @@ A `cd` in the call keeps the whole call inside, even where the other part has an
 
 ```text
 $ claude-sandbox-doctor why "cd infra && terraform plan" --project ~/shop
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/shop
 call      cd infra && terraform plan
 
@@ -371,7 +371,7 @@ excludedCommands that apply
   "cd infra && terraform *"               project .claude/settings.json:9
   "npm run build > build.log"             project .claude/settings.json:10
 
-Approval  approved without a prompt: it runs inside the sandbox and autoAllowBashIfSandboxed is on
+Approval  autoAllowBashIfSandboxed is not set, which from Claude Code 2.1.324 means off (2.1.323 and earlier approved a sandboxed command without a prompt), so it goes through the regular permission flow: your allow rules and the permission mode decide whether you see a prompt (a read-only command such as ls passes)
 If Claude retries with dangerouslyDisableSandbox: it runs outside the sandbox
           (allowUnsandboxedCommands is not false); you are asked, or your allow rules decide. Ask with
           --retry.
@@ -384,7 +384,7 @@ So does a redirection to a file (the entry `npm run build > build.log` can never
 
 ```text
 $ claude-sandbox-doctor why "npm run build > build.log" --project ~/shop
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/shop
 call      npm run build > build.log
 
@@ -402,7 +402,7 @@ excludedCommands that apply
   "cd infra && terraform *"               project .claude/settings.json:9
   "npm run build > build.log"             project .claude/settings.json:10
 
-Approval  approved without a prompt: it runs inside the sandbox and autoAllowBashIfSandboxed is on
+Approval  autoAllowBashIfSandboxed is not set, which from Claude Code 2.1.324 means off (2.1.323 and earlier approved a sandboxed command without a prompt), so it goes through the regular permission flow: your allow rules and the permission mode decide whether you see a prompt (a read-only command such as ls passes)
 If Claude retries with dangerouslyDisableSandbox: it runs outside the sandbox
           (allowUnsandboxedCommands is not false); you are asked, or your allow rules decide. Ask with
           --retry.
@@ -415,7 +415,7 @@ Note: A PreToolUse hook, or a mod, can decide a call before any of this; hooks a
 
 ```text
 $ claude-sandbox-doctor why "npm test" --project ~/shop --retry
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/shop
 call      npm test   (as a retry with dangerouslyDisableSandbox: true)
 
@@ -441,7 +441,7 @@ In `~/locked`, which has `allowUnsandboxedCommands: false`, the retry is refused
 
 ```text
 $ claude-sandbox-doctor why "npm test" --project ~/locked --retry
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/locked
 call      npm test   (as a retry with dangerouslyDisableSandbox: true)
 
@@ -453,7 +453,7 @@ Runs      refused
 excludedCommands that apply
   "gh *"                                  project .claude/settings.json:5
 
-Approval  approved without a prompt: it runs inside the sandbox and autoAllowBashIfSandboxed is on
+Approval  autoAllowBashIfSandboxed is not set, which from Claude Code 2.1.324 means off (2.1.323 and earlier approved a sandboxed command without a prompt), so it goes through the regular permission flow: your allow rules and the permission mode decide whether you see a prompt (a read-only command such as ls passes)
 
 Note: A PreToolUse hook, or a mod, can decide a call before any of this; hooks are not read. The
       model, not you, decides whether to retry with dangerouslyDisableSandbox.
@@ -463,7 +463,7 @@ An excluded command in `~/locked` still leaves the sandbox, because `excludedCom
 
 ```text
 $ claude-sandbox-doctor why "gh pr list" --project ~/locked
-claude-sandbox-doctor 1.1.1  where a Bash call runs
+claude-sandbox-doctor 1.2.0  where a Bash call runs
 project   /home/runner/locked
 call      gh pr list
 
@@ -488,7 +488,7 @@ Sandbox settings that can never take effect, each with the file and line, what C
 
 ```text
 $ claude-sandbox-doctor lint --project ~/shop
-claude-sandbox-doctor 1.1.1  lint
+claude-sandbox-doctor 1.2.0  lint
 project   /home/runner/shop
 system    Linux, Ubuntu 24.04.5 LTS
 
@@ -576,7 +576,7 @@ show    { ok, project, configDir, configSource,
                              set: [ { value, source: { scope, label, display, path, rank, line }, ignored? } ], shadowed: [ ] } },
           lists: { <key>: [ { value, sources: [ { scope, label, display, path, rank, line } ], ignored: [ ] } ] },
           effective: { platform, claudePlatform, enabledInSettings, platformListed, enabled, failIfUnavailable,
-                       autoAllowBashIfSandboxed, allowUnsandboxedCommands, strictBy: [ ], adminRequired, adminReasons: [ ],
+                       autoAllowBashIfSandboxed, autoAllowSet, allowUnsandboxedCommands, strictBy: [ ], adminRequired, adminReasons: [ ],
                        excludedCommands: [ { value, sources: [ ] } ], ignoredExcluded: [ ], blockReads: { on, sources: [ ] } },
           notes: [ ], derived: { allowWrite: [ ], denyWrite: [ ], denyRead: [ ], allowedDomains: [ ], deniedDomains: [ ], additionalDirectories: [ ] },
           notRead: [ ] }
@@ -587,7 +587,7 @@ why     { ok, command, retry, platform, sandbox: { on, enabledInSettings, platfo
                      reasons: [ { code, text } ], normalized } ],
           excludedBy: [ { part, entry, source: { scope, label, display, path, rank, line } } ],
           verdict, basis, runs, strict, strictBy: [ ],
-          approval: { how, outcome, text, shapes: [ { code, text } ], denyRule, askRule, allowRule },
+          approval: { how, outcome, text, shapes: [ { code?, text? } ], denyRule, askRule, allowRule },
           notes: [ ], reason, project, configDir, system: { id, label, claude, hasSandbox, detail } }
 lint    { ok, project, configDir, platform: { id, label, claude, hasSandbox, detail }, hostMissing: [ ],
           findings: [ { effect, basis, id, severity, scope, file, display, line, keyPath, message, fix, reason? } ],
@@ -745,10 +745,10 @@ Checked on 2026-10-16 and 2026-10-17 on Windows 11 with Node 24.19.0, git 2.55.0
   | 2.1.301 | 38958399160 | 31 of 31 checks pass | 3 of 3 checks pass | 26 of 31 checks pass, 5 skipped |
   | 2.1.302 | 38958440346 | 31 of 31 checks pass | 3 of 3 checks pass | 26 of 31 checks pass, 5 skipped |
 
-  The findings below were the same on every version.
+  The findings below were the same on every version, until the changes of 2.1.317 to 2.1.324 at the end of this list.
 
   - **Where a call runs.** The table of 221 calls (compounds, redirections, substitutions, wrappers, `excludedCommands` patterns, git forms and flags, interpreters, the retry with `allowUnsandboxedCommands` unset, true and false, the sandbox off, leading spaces, `*`) was run in groups of up to 24 calls, one `claude -p` session for each group. The binary ran every call where `why` says: inside the sandbox or outside it.
-  - **Who approves the call.** 27 approval rows (the default permission mode, no allow rule for Bash): `autoAllowBashIfSandboxed` approved a sandboxed call, a read-only command passed either way, and the shapes `FOO=bar cmd`, `make CC=clang`, `eval` and a redirection from or to `/dev/tcp` went to the regular flow; deny, ask and allow rules, a bare `Bash` ask rule and the sandbox off behaved as `why` says.
+  - **Who approves the call.** 29 approval rows since 1.2.0, 27 before (the default permission mode, no allow rule for Bash; the rows of `autoAllowBashIfSandboxed` set it since 1.2.0, see below): `autoAllowBashIfSandboxed` approved a sandboxed call, a read-only command passed either way, and the shapes `FOO=bar cmd`, `make CC=clang`, `eval` and a redirection from or to `/dev/tcp` went to the regular flow; deny, ask and allow rules, a bare `Bash` ask rule and the sandbox off behaved as `why` says.
   - **The network.** A request to a host that is not in `allowedDomains` was refused by the proxy in the default, `acceptEdits` and `dontAsk` modes and let through in `bypassPermissions` mode, also when a user file sets the mode and not when a project file does; a `deniedDomains` entry and (in a user file) `strictAllowlist` held in every mode. The table of 42 requests to hosts under `.invalid` showed which spellings of an entry match: a name (case-insensitive), `*.name` for subdomains at any depth and not for the name, `*`, `name:port` and `*.name:port`; and which never match anything (a scheme, a path, a user name, a star that is not the first label, a space, an empty entry, odd characters, a port of 0, above 65535 or with a leading zero).
   - **Keys that do nothing.** A settings file with a comment, with a trailing comma or with a value of the wrong type in its `sandbox` block was ignored whole (the sandbox it switched on stayed off, and `claude doctor` listed the wrong type under Invalid settings); a key that does not exist (`excludedCommand`) did nothing and `claude doctor` said nothing; `enabledPlatforms`, `network.allowManagedDomainsOnly`, `bwrapPath` and `socatPath` in a user file did nothing; `allowWrite` entries for `.mcp.json` and `.claude/settings.json` did not lift their protection; a wildcard in an `allowWrite` entry gave nothing on Linux (on macOS a new file whose name the wildcard matched could be written, and a file inside a folder it matched could not). `claude doctor` called an IPv6 domain without brackets unreliable and said nothing about the other spellings.
   - **Managed settings.** On a CI runner, with `managed-settings.json` written to `/etc/claude-code` or `/Library/Application Support/ClaudeCode` with `sudo` and removed again: 16 rows with managed settings (an admin-required sandbox ignored a repository's `excludedCommands`, `allowUnsandboxedCommands: true` and `allowedDomains`; managed entries counted; `enabledPlatforms` naming another system, or a name that is none, left the sandbox inert; a `false` in the user file held against a project's `true`) ran where `why` says; only the managed `allowedDomains` counted under `allowManagedDomainsOnly`; the managed `bwrapPath` was used and a relative one dropped; managed `defaultMode: bypassPermissions` let a host through; and `show`, `lint` and `why` read the same system folder.
@@ -759,6 +759,12 @@ Checked on 2026-10-16 and 2026-10-17 on Windows 11 with Node 24.19.0, git 2.55.0
   - **The skill.** `claude plugin validate` and `--strict` pass. With the plugin loaded, a plain prompt's request was the same size as without it (69,652 characters on 2.1.299 and 69,122 on 2.1.295 on Windows, 64,688 on Linux and 65,667 on macOS against 2.1.301 in CI) and had the same tool list. `/sandbox-doctor:check` reached the model with the lint report for the project, the check of the machine and the instruction after them; a skill whose command line exits 1 never reached the model, which is why the markdown reports exit 0. The figures in "What it costs in tokens" are from that capture. The model could run the commands from the skill's `allowed-tools` with no prompt in the default permission mode, with the Bash tool and, on Windows, the PowerShell tool. `claude plugin details`: `Always-on: ~10 tok`, `check < 20` always-on and about 100 when used.
   - **The install line.** `npx -y github:nrzz/claude-sandbox-doctor#<commit> check --markdown`, with a throwaway home and npm cache, was run by the e2e job on Linux and on macOS (Node 22) against the commit it was testing. It printed the report on the third attempt in both jobs. The first two, made within a minute of the push, stopped with npm's `GitFetcher requires an Arborist constructor to pack a tarball`; I take that to mean that GitHub was not yet serving the tarball of the new commit, which was not checked. The step tries four times, 30 seconds apart. In a one-off experiment on a branch that was deleted afterwards, the same line, the line without a commit, and `npm exec` worked at once on Node 18, 20, 22 and 24, inside and outside a checkout of the repository, for commits that were a few minutes old.
 - **The rules.** The table under How it works says, for each finding, whether the binary was asked (`binary`) or the documentation is the only source (`docs`). The `docs` rules are `inert-here`, `mask-in-repository` and `broad-entry`, and `key-scope` for the keys not named above.
+
+- **What changed from 2.1.317 to 2.1.328.** The weekly run turned red on 9 November 2026. On 19 November every release from 2.1.316 to 2.1.328 was put to the checks through the workflow's `claude_version` input, and the settings code of 2.1.323 and 2.1.324 was read from the binaries:
+  - **2.1.324 turned `sandbox.autoAllowBashIfSandboxed` off when it is not set.** 2.1.323 read an unset value as `true`; the settings schema of 2.1.324 says "Default: false, so sandboxed commands go through the same permission flow as any other command". A sandboxed `mytool run` that ran without a prompt on 2.1.323 needed one on 2.1.324 and 2.1.328 (refused in `claude -p`), on Linux and on macOS. Since 1.2.0 `show`, `why` and the JSON (`effective.autoAllowSet`) follow 2.1.324 and say that 2.1.323 and earlier approved such a call, and `check --live` sets the key to `true` for its own trial. The checks of the sandbox itself set it to `true`, the approval rows recorded with it on say so, and the two rows of `approval-default` hold the new default.
+  - **2.1.323 reworded the second line of the refusal to start** with `failIfUnavailable`: "Refusing to start without a working sandbox (see sandbox.failIfUnavailable)." in place of a line that said "sandbox.failIfUnavailable is set". The first line, the one `lint` quotes, did not change.
+  - **2.1.317 stopped running a command with backticks under a bash older than 4.** On macOS, whose `/bin/bash` is 3.2.57, the table's row ``docker run `echo x` `` ended with exit code 126 and "Claude Code did not run this command: this shell (bash 3.2.57) is too old to run it reliably" before the sandbox decided anything; the message names `CLAUDE_CODE_SHELL` (zsh or a newer bash) as the way round. The table check tells that row apart from a call that left no mark; `why` does not predict it.
+- **Ubuntu 26.04.** GitHub's `ubuntu-latest` became Ubuntu 26.04 in November 2026 (image 20261111). There, with bubblewrap, socat and the documentation's AppArmor profile, every sandboxed command failed before it started, on every version tried (2.1.317 to 2.1.328): `apply-seccomp: write /proc/self/setgroups (nested userns is capability-restricted; caller must provide CAP_SYS_ADMIN): Permission denied`, while `check` said the sandbox could start. That is not a change of Claude Code, so the tool does not guess at it: the Linux jobs run on `ubuntu-24.04`, where the findings above were recorded, and [issue #4](https://github.com/nrzz/claude-sandbox-doctor/issues/4) holds what was seen and what would settle it.
 
 ## Not verified
 

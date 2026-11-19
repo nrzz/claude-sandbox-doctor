@@ -386,7 +386,9 @@ let acount = 0;
 function approve(group, settings, list) {
   for (const [command, expect, extra] of list) approvals.push({ id: `${group}-${String(++acount).padStart(3, "0")}`, group, settings, command, expect, ...(extra || {}) });
 }
-const P = (perm, sandbox = {}) => ({ user: { sandbox: { enabled: true, ...sandbox }, permissions: perm } });
+// The rows were recorded when an unset autoAllowBashIfSandboxed meant on (to 2.1.323), so they set it; approval-default holds the
+// default of 2.1.324 and later: off, so a sandboxed command goes through the regular permission flow
+const P = (perm, sandbox = {}) => ({ user: { sandbox: { enabled: true, autoAllowBashIfSandboxed: true, ...sandbox }, permissions: perm } });
 approve("approval-basic", P({}, { excludedCommands: ["gh *"] }), [
   ["mytool run", "approved"],
   ["mytool run > out.txt", "approved"],
@@ -404,6 +406,7 @@ approve("approval-basic", P({}, { excludedCommands: ["gh *"] }), [
   ["exec 3<>/dev/tcp/127.0.0.1/9", "asked"],
   ["bash -c \"echo hi > /dev/tcp/127.0.0.1/9\"", "approved"],
 ]);
+approve("approval-default", { user: { sandbox: { enabled: true, excludedCommands: ["gh *"] } } }, [["mytool run", "asked"], ["gh pr list", "asked"]]);
 approve("approval-off", { user: { sandbox: { excludedCommands: ["gh *"] } } }, [["mytool run", "asked"]]);
 approve("approval-off-explicit", { user: { sandbox: { enabled: false, autoAllowBashIfSandboxed: true } } }, [["mytool run", "asked"]]);
 approve("approval-noauto", P({}, { autoAllowBashIfSandboxed: false }), [["mytool run", "asked"]]);

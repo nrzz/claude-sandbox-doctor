@@ -5,7 +5,7 @@
 // refuses to start. `check` and `lint` must say the same.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { claudeInfo, fakeApi, put, runClaude, sandbox, skip, streamEvents, toolCalls, resultEvent, IS_WIN } from "./claude-sandbox.mjs";
+import { atLeast, claudeInfo, fakeApi, put, runClaude, sandbox, skip, streamEvents, toolCalls, resultEvent, IS_WIN } from "./claude-sandbox.mjs";
 import { realSys } from "../src/host.mjs";
 import { run, world } from "./helpers.mjs";
 
@@ -49,7 +49,9 @@ test("sandbox.enabled with failIfUnavailable on: Claude Code refuses to start, s
   assert.equal(g.requests, 0, "no request reached the model");
   assert.match(g.r.err, /Error: sandbox required but unavailable: /);
   assert.match(g.r.err, TEXT[WHERE]);
-  assert.match(g.r.err, /sandbox\.failIfUnavailable is set/);
+  // the second line: "sandbox.failIfUnavailable is set" to 2.1.322, "Refusing to start without a working sandbox (see
+  // sandbox.failIfUnavailable)." from 2.1.323
+  assert.match(g.r.err, atLeast(2, 1, 323) ? /Refusing to start without a working sandbox \(see sandbox\.failIfUnavailable\)\./ : /sandbox\.failIfUnavailable is set/);
   assert.equal(g.result.subtype, "error_during_execution");
   assert.match(g.result.errors[0], /^Sandbox required but unavailable: /);
   t.diagnostic(`Claude Code ${claudeInfo().version} on ${WHERE}: ${String(g.result.errors[0]).slice(0, 260)}`);

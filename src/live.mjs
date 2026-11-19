@@ -169,7 +169,8 @@ export async function runLive({ claude, sys, timeout = 120000, extraSettings = {
   const trust = { hasTrustDialogAccepted: true, allowedTools: [] };
   const projects = { [work]: trust, [work.replace(/\\/g, "/")]: trust };
   fs.writeFileSync(path.join(cfg, ".claude.json"), JSON.stringify({ hasCompletedOnboarding: true, projects }));
-  const settings = { sandbox: { enabled: true, ...extraSettings }, permissions: { allow: ["Bash(printenv SANDBOX_RUNTIME)"] } };
+  // autoAllowBashIfSandboxed: the trial's commands run in the sandbox without a prompt, as they did by default to Claude Code 2.1.323
+  const settings = { sandbox: { enabled: true, autoAllowBashIfSandboxed: true, ...extraSettings }, permissions: { allow: ["Bash(printenv SANDBOX_RUNTIME)"] } };
   fs.writeFileSync(path.join(cfg, "settings.json"), JSON.stringify(settings, null, 2));
   const probes = [
     { id: "inside", kind: "inside", title: "a command runs inside the sandbox", command: "printenv SANDBOX_RUNTIME" },

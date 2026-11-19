@@ -5,7 +5,7 @@
 // release turning the job red.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { claudeInfo, skip, IS_WIN } from "./claude-sandbox.mjs";
+import { atLeast, claudeInfo, skip, IS_WIN } from "./claude-sandbox.mjs";
 import { approvalGroups, approvals, groups, tableRows as rows } from "./why-table.mjs";
 import { approvalOf, runGroups } from "./oracle.mjs";
 
@@ -28,7 +28,13 @@ test("the table of calls put to the binary: every row", { skip: SKIP, timeout: 2
   t.diagnostic(`Claude Code ${claudeInfo().version}: ${rows.length - differ.length - none.length} of ${rows.length} rows gave the recorded answer; ${none.length} did not run anything`);
   for (const d of differ) t.diagnostic(`  differs: ${show(d)}`);
   for (const r of none) { const g = byId.get(r.id); t.diagnostic(`  ran nothing: ${r.id} ${JSON.stringify(r.command)} (${g ? `called=${g.called} text=${JSON.stringify(String(g.text).slice(0, 120))} decision=${JSON.stringify(g.decision)} session=${JSON.stringify(g.session)}` : "no result"})`); }
-  assert.equal(none.length, 0, `${none.length} rows ran nothing: the stand-in programs left no mark`);
+  // From 2.1.317 Claude Code does not run a command with backticks under a bash older than 4 (macOS's /bin/bash is 3.2): exit 126,
+  // "this shell (bash 3.2.57) is too old to run it reliably". Such a row never reaches the sandbox; it is told apart, and only
+  // a row with a backtick, on macOS, from 2.1.317, may end that way
+  const tooOld = none.filter((r) => { const g = byId.get(r.id); return g && /Claude Code did not run this command: this shell \(bash [0-3]\./.test(String(g.text)); });
+  for (const r of tooOld) t.diagnostic(`  not run, the shell is too old: ${r.id} ${JSON.stringify(r.command)}`);
+  assert.ok(tooOld.every((r) => process.platform === "darwin" && atLeast(2, 1, 317) && r.command.includes("`")), "a row refused for an old shell is one with a backtick, on macOS, from 2.1.317");
+  assert.equal(none.length - tooOld.length, 0, `${none.length - tooOld.length} rows ran nothing: the stand-in programs left no mark`);
   if (known) assert.deepEqual(differ.map(show), []);
   else {
     assert.deepEqual(differ.filter((d) => d.row.core).map(show), [], "the core rows");

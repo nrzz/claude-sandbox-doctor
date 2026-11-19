@@ -20,7 +20,7 @@ async function runGroup(g) {
   const rows = requests.filter((r) => groups[r.group] === g);
   for (let attempt = 0; attempt < 3; attempt++) {
     const sb = sandbox("domains");
-    put(sb.user, { sandbox: { enabled: true, network: { allowedDomains: g.allow, ...(g.deny ? { deniedDomains: g.deny } : {}) } } });
+    put(sb.user, { sandbox: { enabled: true, autoAllowBashIfSandboxed: true, network: { allowedDomains: g.allow, ...(g.deny ? { deniedDomains: g.deny } : {}) } } });
     const api = await fakeApi({ calls: rows.map((r) => ({ command: curl(r.host, r.port) })) });
     try {
       const run = await runClaude(sb, api, ["-p", "PROBE-MAIN go", "--output-format", "stream-json", "--verbose", "--permission-mode", "default", "--max-turns", String(rows.length + 3)]);

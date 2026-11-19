@@ -29,13 +29,13 @@ async function session(label, settings, commands, { env = {}, allowBash = false 
 test("a write outside the project is blocked inside the sandbox, a call taken out of it by excludedCommands writes, and the transcript says which", { skip: SKIP, timeout: 300000 }, async (t) => {
   const sb0 = sandbox("probe-write");
   const target = path.join(sb0.home, "outside-write");
-  const inside = await session("write-in", { sandbox: { enabled: true } }, [`touch ${JSON.stringify(target)}`, "printenv SANDBOX_RUNTIME"]);
+  const inside = await session("write-in", { sandbox: { enabled: true, autoAllowBashIfSandboxed: true } }, [`touch ${JSON.stringify(target)}`, "printenv SANDBOX_RUNTIME"]);
   assert.equal(fs.existsSync(target), false, "the sandbox kept the write out");
   const [write, env] = inside.calls;
   assert.match(write.text, LINUX ? /Read-only file system/ : /Operation not permitted/);
   assert.equal(write.isError, true);
   assert.match(env.text, /^1\s*$/m, "SANDBOX_RUNTIME=1 for a command inside the sandbox");
-  const out = await session("write-out", { sandbox: { enabled: true, excludedCommands: ["touch *"] } }, [`touch ${JSON.stringify(path.join(sb0.home, "outside-write-2"))}`], { allowBash: true });
+  const out = await session("write-out", { sandbox: { enabled: true, autoAllowBashIfSandboxed: true, excludedCommands: ["touch *"] } }, [`touch ${JSON.stringify(path.join(sb0.home, "outside-write-2"))}`], { allowBash: true });
   assert.equal(fs.existsSync(path.join(sb0.home, "outside-write-2")), true, "the excluded call ran outside the sandbox and wrote");
   t.diagnostic(`Claude Code ${claudeInfo().version}: write outside -> ${JSON.stringify(write.text.split("\n")[1] || write.text).slice(0, 140)}`);
   void out;
@@ -44,13 +44,13 @@ test("a write outside the project is blocked inside the sandbox, a call taken ou
 const curl = (host) => `curl -sS -m 10 -o /dev/null -w "%{http_code}" http://${host}/`;
 
 test("a connection to a host that is not in allowedDomains is refused by the sandbox's proxy and the result names the host; with the host in allowedDomains the proxy lets it through; in bypassPermissions mode it lets every host through", { skip: SKIP, timeout: 300000 }, async (t) => {
-  const run = (label, mode, network) => runSession({ label, mode, user: { sandbox: { enabled: true, ...(network ? { network } : {}) } }, project: {}, programs: [], commands: [curl("probe-a.invalid")] });
+  const run = (label, mode, network) => runSession({ label, mode, user: { sandbox: { enabled: true, autoAllowBashIfSandboxed: true, ...(network ? { network } : {}) } }, project: {}, programs: [], commands: [curl("probe-a.invalid")] });
   const closed = await run("net-closed", "default");
   const open = await run("net-open", "default", { allowedDomains: ["probe-a.invalid"] });
   const bypass = await run("net-bypass", "bypassPermissions");
   const bypassManaged = await run("net-bypass-denied", "bypassPermissions", { deniedDomains: ["probe-a.invalid"] });
   const strictUser = await run("net-strict-user", "bypassPermissions", { strictAllowlist: true });
-  const strictProject = await runSession({ label: "net-strict-project", mode: "bypassPermissions", user: { sandbox: { enabled: true } }, project: { sandbox: { network: { strictAllowlist: true } } }, programs: [], commands: [curl("probe-a.invalid")] });
+  const strictProject = await runSession({ label: "net-strict-project", mode: "bypassPermissions", user: { sandbox: { enabled: true, autoAllowBashIfSandboxed: true } }, project: { sandbox: { network: { strictAllowlist: true } } }, programs: [], commands: [curl("probe-a.invalid")] });
   const refused = closed.calls[0].text;
   assert.ok(refused.includes("403"), refused);
   assert.ok(refused.includes("network-outbound probe-a.invalid:80"), refused);
@@ -67,7 +67,7 @@ test("a connection to a host that is not in allowedDomains is refused by the san
 test("the permission mode decides what happens to a host that is not allowed: refused in default, acceptEdits and dontAsk, let through in bypassPermissions, also when settings.json sets the mode", { skip: SKIP, timeout: 400000 }, async (t) => {
   const seen = {};
   const go = async (label, mode, user, project = {}) => {
-    const r = await runSession({ label: `mode-${label}`, mode, user: { sandbox: { enabled: true }, ...user }, project, programs: [], commands: [curl("probe-a.invalid")] });
+    const r = await runSession({ label: `mode-${label}`, mode, user: { sandbox: { enabled: true, autoAllowBashIfSandboxed: true }, ...user }, project, programs: [], commands: [curl("probe-a.invalid")] });
     const text = r.calls[0] ? r.calls[0].text : "(the call did not come back)";
     seen[label] = text.replace(/\s+/g, " ").slice(0, 70);
     return text.includes("403");
